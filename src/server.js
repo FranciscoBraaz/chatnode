@@ -3,9 +3,13 @@ import http from "http"
 import dotenv from "dotenv"
 import cors from "cors"
 import { Server } from "socket.io"
+
 import apiRoutes from "./routes/index.js"
+import { mongoConnect } from "./database/mongo.js"
 
 dotenv.config()
+
+mongoConnect()
 
 const app = express()
 const server = http.createServer(app)
