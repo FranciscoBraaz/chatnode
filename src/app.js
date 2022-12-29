@@ -9,7 +9,7 @@ import { mongoConnect } from "./database/mongo.js"
 
 dotenv.config()
 
-mongoConnect()
+// mongoConnect()
 
 const appExpress = express()
 const server = http.createServer(appExpress)

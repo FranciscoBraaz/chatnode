@@ -9,6 +9,7 @@ export async function handleRegister(req, res) {
   for (const field of requiredFields) {
     if (!req.body[field]) {
       res.status(400).json({ message: "Parâmetros incompletos" })
+      return
     }
   }
 
@@ -20,6 +21,7 @@ export async function handleRegister(req, res) {
 
   if (userFound) {
     res.status(400).json({ message: "Usuário já cadastrado" })
+    return
   }
 
   const hash = bcrypt.hashSync(password, 10)
@@ -39,7 +41,7 @@ export async function handleLogin(req, res) {
 
   const user = await User.findOne({ email })
 
-  if (!user || (user && user.password !== password)) {
+  if (!user || (user && !bcrypt.compareSync(password, user.password))) {
     res.status(400).json({ message: "E-mail ou senha incorretos" })
     return
   }
