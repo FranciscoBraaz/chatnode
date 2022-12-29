@@ -1,7 +1,6 @@
 import JWT from "jsonwebtoken"
 import dotenv from "dotenv"
 import User from "../models/User"
-import e from "express"
 
 async function handleLogin(req, res) {
   const { cookies } = req
