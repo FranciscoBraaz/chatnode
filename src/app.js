@@ -11,20 +11,20 @@ dotenv.config()
 
 mongoConnect()
 
-const app = express()
-const server = http.createServer(app)
+const appExpress = express()
+const server = http.createServer(appExpress)
 const io = new Server(server, {
   cors: "http://localhost:3000",
 })
 
-app.use(cors())
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+appExpress.use(cors())
+appExpress.use(express.urlencoded({ extended: true }))
+appExpress.use(express.json())
 
 io.on("connection", (socket) => {
   console.log("Conexão detectada...")
 })
 
-app.use("/", apiRoutes)
+appExpress.use("/", apiRoutes)
 
-export default server
+export default appExpress

@@ -1,4 +1,6 @@
-import { Schema, model, connection } from "mongoose"
+import mongoose from "mongoose"
+
+const { Schema, model, connection } = mongoose
 
 const schema = new Schema({
   email: { type: String, required: true },

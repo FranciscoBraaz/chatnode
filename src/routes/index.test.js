@@ -18,12 +18,9 @@ describe("Testing index route", () => {
     await mongoose.connection.close()
   })
 
-  it("should show welcome message", (done) => {
-    request(app)
-      .get("/")
-      .then((response) => {
-        expect(response.body.message).toBe("Bem vindo")
-        return done()
-      })
+  it("should show welcome message", async () => {
+    const response = await request(app).get("/")
+
+    expect(response.body.message).toBe("Bem vindo")
   })
 })
