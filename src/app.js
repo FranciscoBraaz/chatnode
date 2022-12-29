@@ -2,6 +2,7 @@ import express from "express"
 import http from "http"
 import dotenv from "dotenv"
 import cors from "cors"
+import cookieParser from "cookie-parser"
 import { Server } from "socket.io"
 
 import apiRoutes from "./routes/index.js"
@@ -20,6 +21,7 @@ const io = new Server(server, {
 appExpress.use(cors())
 appExpress.use(express.urlencoded({ extended: true }))
 appExpress.use(express.json())
+appExpress.use(cookieParser())
 
 io.on("connection", (socket) => {
   console.log("Conexão detectada...")

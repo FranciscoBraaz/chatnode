@@ -16,6 +16,8 @@ describe("Testing auth routes", () => {
     username: "teste",
   }
 
+  let currentRefreshToken = null
+
   beforeAll(async () => {
     try {
       await connect(db.url)
@@ -60,8 +62,47 @@ describe("Testing auth routes", () => {
 
   it("should login returning user information and access token", async () => {
     const response = await request(app).post("/login").send(user)
+    const cookies = response.headers["set-cookie"]
 
+    const jwtCookie = cookies.filter((cookie) => cookie.startsWith("jwt"))[0]
+    const refreshTokenJwt = jwtCookie.split(";")[0]
+    const refreshTokenValue = refreshTokenJwt.split("=")[1]
+
+    currentRefreshToken = refreshTokenValue
     expect(response.body).toHaveProperty("user")
     expect(response.body).toHaveProperty("accessToken")
+    expect(refreshTokenValue.length).toBeGreaterThan(0)
+  })
+
+  it("should create a new access token and a new refresh token", async () => {
+    const response = await request(app)
+      .get("/refresh-token")
+      .set("Cookie", [`jwt=${currentRefreshToken}`])
+    const cookies = response.headers["set-cookie"]
+
+    const jwtCookie = cookies.filter((cookie) => cookie.startsWith("jwt"))[
+      cookies.length - 1
+    ]
+    const refreshTokenJwt = jwtCookie.split(";")[0]
+    const refreshTokenValue = refreshTokenJwt.split("=")[1]
+
+    expect(response.body).toHaveProperty("accessToken")
+    expect(refreshTokenValue.length).toBeGreaterThan(0)
+  })
+
+  it("should not create a new accessToken and a new refreshToken when jwt cookie is empty", async () => {
+    const response = await request(app)
+      .get("/refresh-token")
+      .set("Cookie", [`jwt=`])
+
+    expect(response.status).toBe(401)
+  })
+
+  it("should not create a new accessToken and a new refreshToken when current refreshToken is malformed", async () => {
+    const response = await request(app)
+      .get("/refresh-token")
+      .set("Cookie", [`jwt=kdsjdskj`])
+
+    expect(response.status).toBe(403)
   })
 })
