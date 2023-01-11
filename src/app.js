@@ -48,6 +48,17 @@ io.on("connection", (socket) => {
     joined: socket.decoded.username,
     userList: connectedUsers,
   })
+
+  socket.on("disconnect", () => {
+    connectedUsers = connectedUsers.filter(
+      (connectedUser) => connectedUser !== socket.decoded.username,
+    )
+
+    socket.broadcast.emit("list-update", {
+      left: socket.decoded.username,
+      userList: connectedUsers,
+    })
+  })
 })
 
 appExpress.use("/", apiRoutes)
