@@ -63,8 +63,8 @@ export async function handleLogin(req, res) {
     : user.refreshToken.filter((rt) => rt !== cookies.jwt)
 
   if (cookies?.jwt) {
-    res.clearCookie("jwt", { httpOnly: true })
-    // res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true })
+    // res.clearCookie("jwt", { httpOnly: true })
+    res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true })
   }
 
   const userToReturn = {
@@ -78,8 +78,8 @@ export async function handleLogin(req, res) {
 
   res.cookie("jwt", newRefreshToken, {
     httpOnly: true,
-    // sameSite: "none",
-    // secure: true,
+    sameSite: "none",
+    secure: true,
     maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
   })
   res.status(200).json({ user: userToReturn, accessToken })

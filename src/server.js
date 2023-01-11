@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
-import app from "./app.js"
+import { appExpress, server } from "./app"
 
 dotenv.config()
 
-app.listen(process.env.PORT)
+server.listen(process.env.PORT)

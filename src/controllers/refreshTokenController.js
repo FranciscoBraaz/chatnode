@@ -4,15 +4,14 @@ import User from "../models/User"
 
 export async function handleRefreshToken(req, res) {
   const { cookies } = req
-
   if (!cookies?.jwt) {
     res.status(401).json({ message: "Não autorizado" })
     return
   }
 
   const refreshToken = cookies.jwt
-  res.clearCookie("jwt", { httpOnly: true })
-  // res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true })
+  // res.clearCookie("jwt", { httpOnly: true })
+  res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true })
 
   let foundUser = null
   try {
@@ -21,7 +20,7 @@ export async function handleRefreshToken(req, res) {
 
     if (!foundUser) {
       foundUser = await User.findById(decoded.id)
-
+      console.log("Not find user")
       if (foundUser) {
         foundUser.refreshToken = []
         await foundUser.save()
@@ -36,13 +35,13 @@ export async function handleRefreshToken(req, res) {
     )
 
     const accessToken = JWT.sign(
-      { id: foundUser.id, email: foundUser.email },
+      { id: foundUser.id, username: foundUser.username },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "15m" },
     )
 
     const newRefreshToken = JWT.sign(
-      { id: foundUser.id, email: foundUser.email },
+      { id: foundUser.id, username: foundUser.email },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" },
     )
@@ -52,11 +51,14 @@ export async function handleRefreshToken(req, res) {
 
     res.cookie("jwt", newRefreshToken, {
       httpOnly: true,
-      // sameSite: "none",
-      // secure: true,
+      sameSite: "none",
+      secure: true,
       maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
     })
-    res.status(200).json({ accessToken })
+    res.status(200).json({
+      user: { id: foundUser.id, username: foundUser.username },
+      accessToken,
+    })
   } catch (error) {
     console.log("Error", error)
     if (error.name === "JsonWebTokenError") {
