@@ -4,6 +4,7 @@ import User from "../models/User"
 
 export async function handleRefreshToken(req, res) {
   const { cookies } = req
+
   if (!cookies?.jwt) {
     res.status(401).json({ message: "Não autorizado" })
     return
@@ -56,7 +57,11 @@ export async function handleRefreshToken(req, res) {
       maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
     })
     res.status(200).json({
-      user: { id: foundUser.id, username: foundUser.username },
+      user: {
+        id: foundUser.id,
+        username: foundUser.username,
+        name: foundUser.name,
+      },
       accessToken,
     })
   } catch (error) {

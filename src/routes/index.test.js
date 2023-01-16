@@ -1,6 +1,6 @@
 import mongoose, { connect } from "mongoose"
 import request from "supertest"
-import app from "../app"
+import { appExpress } from "../app"
 import { dropAllCollections } from "../utils/dropAllCollections"
 import db from "../database/database"
 
@@ -19,7 +19,7 @@ describe("Testing index route", () => {
   })
 
   it("should show welcome message", async () => {
-    const response = await request(app).get("/")
+    const response = await request(appExpress).get("/")
 
     expect(response.body.message).toBe("Bem vindo")
   })

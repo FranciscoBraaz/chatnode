@@ -1,4 +1,7 @@
-const allowedOrigins = ["http://localhost:3000"]
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://chat-node.netlify.app",
+]
 
 export function credentials(req, res, next) {
   const origin = req.headers.origin

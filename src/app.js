@@ -59,6 +59,15 @@ io.on("connection", (socket) => {
       userList: connectedUsers,
     })
   })
+
+  socket.on("send-message", (msg) => {
+    const message = {
+      user: socket.decoded.username,
+      content: msg,
+    }
+    // socket.emit("send-message", message)
+    socket.broadcast.emit("show-message", message)
+  })
 })
 
 appExpress.use("/", apiRoutes)

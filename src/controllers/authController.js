@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 import User from "../models/User"
 
 export async function handleRegister(req, res) {
-  const requiredFields = ["email", "password", "username"]
+  const requiredFields = ["email", "password", "username", "name"]
 
   for (const field of requiredFields) {
     if (!req.body[field]) {
@@ -13,7 +13,7 @@ export async function handleRegister(req, res) {
     }
   }
 
-  const { email, password, username } = req.body
+  const { email, password, username, name } = req.body
 
   const userFound = await User.findOne({
     $or: [{ email: email }, { username: username }],
@@ -25,7 +25,7 @@ export async function handleRegister(req, res) {
   }
 
   const hash = bcrypt.hashSync(password, 10)
-  await User.create({ email, password: hash, username })
+  await User.create({ email, password: hash, username, name })
 
   res.sendStatus(201)
 }
@@ -71,6 +71,7 @@ export async function handleLogin(req, res) {
     id: user.id,
     username: user.username,
     email: user.email,
+    name: user.name,
   }
 
   user.refreshToken = [...newRefreshTokenArray, newRefreshToken]
@@ -83,4 +84,44 @@ export async function handleLogin(req, res) {
     maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
   })
   res.status(200).json({ user: userToReturn, accessToken })
+}
+
+export async function handleLogout(req, res) {
+  const { cookies } = req
+
+  if (!cookies?.jwt) {
+    res.sendStatus(204)
+    return
+  }
+
+  const refreshToken = cookies.jwt
+
+  try {
+    const foundUser = await User.findOne({ refreshToken })
+
+    if (!foundUser) {
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      })
+      res.sendStatus(204)
+      return
+    }
+    console.log("foundUSer", foundUser)
+    foundUser.refreshToken = foundUser.refreshToken.filter(
+      (rf) => rf !== refreshToken,
+    )
+
+    await foundUser.save()
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    })
+    res.sendStatus(204)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Erro interno do servidor" })
+  }
 }

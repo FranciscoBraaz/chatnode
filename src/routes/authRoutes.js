@@ -7,5 +7,6 @@ const router = Router()
 router.post("/login", AuthController.handleLogin)
 router.post("/register", AuthController.handleRegister)
 router.get("/refresh-token", RefreshTokenController.handleRefreshToken)
+router.get("/logout", AuthController.handleLogout)
 
 export default router
